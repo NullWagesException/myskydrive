@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.zf.mapper.FileLinksMapper">
+
+
+    <select id="get" parameterType="com.zf.pojo.FileLinks" resultType="com.zf.pojo.FileLinks">
+        select * from `fileLinks` where id=#{id}
+    </select>
+
+
+    <!--添加-->
+    <insert id="insert" parameterType="com.zf.pojo.FileLinks">
+        insert into `fileLinks` (`filelink`,`linkpassword`,`use`) values (#{filelink},#{linkpassword},#{use})
+    </insert>
+
+    <!--删除-->
+    <delete id="delete" parameterType="int">
+        delete from `fileLinks` where id=#{id}
+    </delete>
+
+
+</mapper>

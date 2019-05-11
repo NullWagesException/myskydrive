@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context" xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-4.2.xsd http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+    <!--加载数据库配置文件-->
+    <context:property-placeholder location="classpath:jdbc.properties"/>
+
+    <!--配置druid连接池相关信息-->
+    <bean id="druid" class="com.alibaba.druid.pool.DruidDataSource">
+        <property name="driverClassName" value="${jdbc.driverClassName}"/>
+        <property name="url" value="${jdbc.url}"/>
+        <property name="username" value="${jdbc.username}"/>
+        <property name="password" value="${jdbc.password}"/>
+    </bean>
+
+    <!--配置sqlSessionFactory交由spring管理-->
+    <bean class="org.mybatis.spring.SqlSessionFactoryBean" id="sqlSessionFactory">
+
+        <!--配置连接池-->
+        <property name="dataSource" ref="druid"/>
+        <!--加载连接文件-->
+
+        <property name="configLocation" value="classpath:SqlMapConfig.xml"/>
+        <!--配置包扫描-->
+        <property name="typeAliasesPackage" value="com.zf.pojo"/>
+        <!--加载mapper映射文件-->
+        <property name="mapperLocations" value="classpath:com/zf/mapper/*.xml"/>
+    </bean>
+
+    <bean id="userService" class="com.zf.service.impl.UserService"/>
+
+    <bean id="fileService" class="com.zf.service.impl.FileService"/>
+
+    <bean id="uplevelService" class="com.zf.service.impl.FileLinksService"/>
+
+    <!--配置动态DAO并交由spring控制-->
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory"/>
+        <property name="basePackage" value="com.zf.mapper"/>
+    </bean>
+
+    <!-- 配置事物管理类 -->
+    <bean id="TransactionManager"
+          class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="druid" />
+    </bean>
+
+    <!-- 开启注解式事物扫描 -->
+    <tx:annotation-driven transaction-manager="TransactionManager"/>
+
+</beans>

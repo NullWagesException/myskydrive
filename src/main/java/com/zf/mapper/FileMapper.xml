@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.zf.mapper.FileMapper">
+
+
+    <select id="get" parameterType="com.zf.pojo.File" resultType="com.zf.pojo.File">
+        select * from `file` where id=#{id}
+    </select>
+
+    <select id="getAll" resultType="com.zf.pojo.File">
+        select * from `file`
+    </select>
+
+
+    <!--添加-->
+    <insert id="insert" parameterType="com.zf.pojo.File">
+        insert into `file` (`username`,`filepath`,`date`) values (#{username},#{filepath},#{date})
+    </insert>
+
+    <!--删除-->
+    <delete id="delete" parameterType="int">
+        delete from `file` where id=#{id}
+    </delete>
+
+    <!--更新-->
+    <update id="update" parameterType="com.zf.pojo.File">
+        update `file` set
+                          username=#{username},
+                          filepath=#{filepath},
+                          date=#{date} where id=#{id}
+    </update>
+
+</mapper>
