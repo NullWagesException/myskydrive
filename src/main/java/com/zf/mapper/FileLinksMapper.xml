@@ -7,13 +7,13 @@
 
 
     <select id="get" parameterType="com.zf.pojo.FileLinks" resultType="com.zf.pojo.FileLinks">
-        select * from `fileLinks` where id=#{id}
+        select * from `fileLinks` where linkpassword=#{linkpassword} and isuse = 0;
     </select>
 
 
     <!--添加-->
     <insert id="insert" parameterType="com.zf.pojo.FileLinks">
-        insert into `fileLinks` (`filelink`,`linkpassword`,`use`) values (#{filelink},#{linkpassword},#{use})
+        insert into `fileLinks` (`filelink`,`linkpassword`,`isuse`,`fileid`) values (#{filelink},#{linkpassword},#{isuse},#{fileid})
     </insert>
 
     <!--删除-->
@@ -22,4 +22,11 @@
     </delete>
 
 
+    <!--更新-->
+    <update id="update" parameterType="com.zf.pojo.FileLinks">
+        update `filelinks` set
+                          filelink=#{filelink},
+                          linkpassword=#{linkpassword},
+                          isuse=#{isuse} where id=#{id}
+    </update>
 </mapper>

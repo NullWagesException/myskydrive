@@ -7,12 +7,4 @@
     <settings>
         <setting name="logImpl" value="STDOUT_LOGGING" />
     </settings>
-
-    <plugins>
-        <plugin interceptor="com.github.pagehelper.PageInterceptor">
-            <!-- config params as the following -->
-            <!--<!–分页参数合理化  –>-->
-            <property name="reasonable" value="true"/>
-        </plugin>
-    </plugins>
 </configuration>

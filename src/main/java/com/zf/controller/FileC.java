@@ -1,7 +1,5 @@
 package com.zf.controller;
 
-import com.github.pagehelper.Page;
-import com.github.pagehelper.PageHelper;
 import com.zf.myutils.SymmetricEncoder;
 import com.zf.pojo.File;
 import com.zf.pojo.FileLinks;
@@ -25,6 +23,9 @@ import java.io.OutputStream;
 import java.net.URLEncoder;
 import java.util.*;
 import java.io.*;
+
+import static com.zf.myutils.FileEncryptAndDecrypt.decrypt;
+import static com.zf.myutils.FileEncryptAndDecrypt.encrypt;
 
 
 @Controller
@@ -62,8 +63,8 @@ public class FileC {
 
     @RequestMapping(value = "upload",method = RequestMethod.POST)
     @ResponseBody
-    public Object upload(MultipartFile file,HttpSession session){
-
+    public Object upload(MultipartFile file,HttpSession session) throws Exception {
+        String filepath = "";
         InputStream inputStream = null;
         OutputStream outputStream = null;
         Map<String,Object> map = new HashMap<>();
@@ -78,7 +79,7 @@ public class FileC {
             String filename = "___" + date.getTime() + "___" + file.getOriginalFilename();
             filename = SymmetricEncoder.encrypt(filename);
             String replace = filename.replace("/", "___");
-            String filepath ="D:/KDR/" +  replace + "." + file.getOriginalFilename().split("\\.")[1];
+            filepath ="D:/KDR/" +  replace + "." + file.getOriginalFilename().split("\\.")[1];
             outputStream = new FileOutputStream(filepath);
             int len = -1;
             while ((len = inputStream.read(bytes)) != -1) {
@@ -110,6 +111,8 @@ public class FileC {
                 e.printStackTrace();
             }
         }
+        //对文件进行加密，密钥为123456
+        encrypt(filepath,"123456");
         map.put("success",true);
         map.put("message","文件提交成功");
         return map;
@@ -145,17 +148,45 @@ public class FileC {
         return map;
     }
 
-    @RequestMapping(value="download",method=RequestMethod.GET)
-    public void download(HttpServletRequest request, HttpServletResponse response, String filelink,String filepassword) throws IOException {
+    @RequestMapping("downloadfile")
+    @ResponseBody
+    public Object download(String filelink,String filepassword) throws IOException {
+        Map<String,Object> map = new HashMap<>();
+        FileLinks links = new FileLinks();
+        //设置链接
+        links.setFilelink(filelink);
+        //设置密码
+        links.setLinkpassword(filepassword);
+        FileLinks fileLinks = fileLinksService.get(links);
 
+        int fileid = fileLinks.getFileid();
+        File file = new File();
+        file.setId(fileid);
+        File file1 = fileService.get(file);
+        if (fileLinks != null){
+            fileLinks.setIsuse(1);
+            //将该记录设置为已使用
+            fileLinksService.update(fileLinks);
+            map.put("success",true);
+            map.put("message",file1.getFilepath());
+            return map;
+        }
+        return null;
+    }
+
+    @RequestMapping("downloading")
+    public void downloading(HttpServletRequest request, HttpServletResponse response,String downloadfilepath) throws Exception {
         //转码，免得文件名中文乱码
-        filelink = URLEncoder.encode(filelink,"UTF-8");
+//        filelink = URLEncoder.encode(filelink,"UTF-8");
+        String replace = downloadfilepath.replace(" ", "+");
+        decrypt("D:/KDR/" + replace,"D:/KDR/temp" + replace,6);
         //设置文件下载头
-        response.addHeader("Content-Disposition", "attachment;filename=" + filelink);
+        response.addHeader("Content-Disposition", "attachment;filename=" + replace);
         //1.设置文件ContentType类型，这样设置，会自动判断下载文件类型
         response.setContentType("multipart/form-data");
+        //将文件完成解密，存放到临时文件
         // 读取要下载的文件，保存到文件输入流
-        FileInputStream in = new FileInputStream("D:/KDR/" + filelink);
+        FileInputStream in = new FileInputStream("D:/KDR/temp" + replace);
         // 创建输出流
         OutputStream out = response.getOutputStream();
         // 创建缓冲区
@@ -169,6 +200,10 @@ public class FileC {
         in.close();
         // 关闭输出流
         out.close();
+        //将临时文件删除
+        java.io.File file = new java.io.File("D:/KDR/temp" + replace);
+//        if (file.exists())
+//            file.delete();
     }
 
     @RequestMapping("share")
@@ -191,9 +226,10 @@ public class FileC {
             String code = getcode();
             map.put("linkpassword",code);
             FileLinks fileLinks = new FileLinks();
+            fileLinks.setFileid(file1.getId());
             fileLinks.setFilelink(file1.getFilepath().split("\\.")[0]);
             fileLinks.setLinkpassword(code);
-            fileLinks.setUse(0);
+            fileLinks.setIsuse(0);
             fileLinksService.insert(fileLinks);
             return map;
         } else {

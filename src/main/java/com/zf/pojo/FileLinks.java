@@ -7,7 +7,16 @@ public class FileLinks {
     private Integer id;
     private String filelink;
     private String linkpassword;
-    private int use;
+    private int isuse;
+    private int fileid;
+
+    public int getFileid() {
+        return fileid;
+    }
+
+    public void setFileid(int fileid) {
+        this.fileid = fileid;
+    }
 
     @Override
     public String toString() {
@@ -15,7 +24,7 @@ public class FileLinks {
                 "id=" + id +
                 ", filelink='" + filelink + '\'' +
                 ", linkpassword='" + linkpassword + '\'' +
-                ", use=" + use +
+                ", isuse=" + isuse +
                 '}';
     }
 
@@ -43,11 +52,11 @@ public class FileLinks {
         this.linkpassword = linkpassword;
     }
 
-    public int getUse() {
-        return use;
+    public int getIsuse() {
+        return isuse;
     }
 
-    public void setUse(int use) {
-        this.use = use;
+    public void setIsuse(int isuse) {
+        this.isuse = isuse;
     }
 }

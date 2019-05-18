@@ -29,4 +29,9 @@ public class FileLinksService implements IFileLinksService {
         fileLinksMapper.delete(id);
     }
 
+    @Override
+    public void update(FileLinks fileLinks) {
+        fileLinksMapper.update(fileLinks);
+    }
+
 }

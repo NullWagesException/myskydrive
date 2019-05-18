@@ -13,5 +13,5 @@ public interface FileLinksMapper {
 
     void delete(Integer id);
 
-
+    void update(FileLinks fileLinks);
 }

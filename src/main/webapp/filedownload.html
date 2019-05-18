@@ -512,7 +512,7 @@
             success:function(rtn){
                 //验证成功
                 if(rtn.success){
-                    jq.myConfirm({title:'提示',message:"正在开始下载..."})
+                    window.open("file/downloading?downloadfilepath="+rtn.message);
                 }else{
                     jq.myConfirm({title:'提示',message:"链接或密码错误"})
                 }
